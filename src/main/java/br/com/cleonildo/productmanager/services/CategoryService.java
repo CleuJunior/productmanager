@@ -9,6 +9,7 @@ import br.com.cleonildo.productmanager.utils.mapper.CategoryMapperUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants
 import static br.com.cleonildo.productmanager.utils.mapper.CategoryMapperUtil.toCategoryResponse;
 
 @Service
+@Transactional
 public class CategoryService {
     private static final Logger LOG = LoggerFactory.getLogger(CategoryService.class);
     private final ICategoryRepository repository;
@@ -29,6 +31,7 @@ public class CategoryService {
         this.repository = repository;
     }
 
+    @Transactional(readOnly = true)
     public List<CategoryResponse> getListCategory() {
         List<CategoryResponse> responseList = repository
                 .findAll()
@@ -40,6 +43,7 @@ public class CategoryService {
         return responseList;
     }
 
+    @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(Long id) {
         Optional<Category> categoryOptional = repository.findById(id);
 
