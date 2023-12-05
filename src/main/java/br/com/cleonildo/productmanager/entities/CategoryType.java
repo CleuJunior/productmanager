@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 public enum CategoryType {
     NORMAL("Normal"),
-    SPECIAL("Special"),
+    SPECIAL("Especial"),
     CUSTOM("Personalizado");
 
-    private final String translatedName;
+    private final String typeName;
 
 }
