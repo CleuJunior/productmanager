@@ -52,7 +52,7 @@ public class CategoryService {
         return toCategoryResponse(categoryOptional.get());
     }
 
-    public CategoryResponse updateCategory(CategoryRequest request, Long id) {
+    public CategoryResponse updateCategory(Long id, CategoryRequest request) {
         Optional<Category> categoryOptional = repository.findById(id);
 
         if (categoryOptional.isEmpty()) {
