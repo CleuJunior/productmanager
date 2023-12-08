@@ -12,13 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static br.com.cleonildo.productmanager.exceptions.ExceptionsConstants.CATEGORY_ID_NOT_FOUND;
+import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.CATEGORY_DELETED_SUCCESSFULLY;
+import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.CATEGORY_FOUND_BY_ID;
 import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.CATEGORY_ID_NOT_FOUND_LOG;
+import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.CATEGORY_LIST;
+import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.CATEGORY_SAVED_SUCCESSFULLY;
 import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.CATEGORY_UPDATE_SUCCESSFULLY;
-import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.FOUND_CATEGORY_BY_ID;
-import static br.com.cleonildo.productmanager.log.constants.CategoryLogConstants.LIST_CATEGORY;
 import static br.com.cleonildo.productmanager.utils.mapper.CategoryMapperUtil.toCategoryResponse;
 
 @Service
@@ -33,31 +34,39 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public List<CategoryResponse> getListCategory() {
-        List<CategoryResponse> responseList = repository
+        var responseList = repository
                 .findAll()
                 .stream()
                 .map(CategoryMapperUtil::toCategoryResponse)
                 .toList();
 
-        LOG.info(LIST_CATEGORY);
+        LOG.info(CATEGORY_LIST);
         return responseList;
     }
 
     @Transactional(readOnly = true)
     public CategoryResponse getCategoryById(Long id) {
-        Optional<Category> categoryOptional = repository.findById(id);
+       var categoryOptional = repository.findById(id);
 
         if (categoryOptional.isEmpty()) {
             LOG.warn(CATEGORY_ID_NOT_FOUND_LOG, id);
             throw new NotFoundException(CATEGORY_ID_NOT_FOUND);
         }
 
-        LOG.info(FOUND_CATEGORY_BY_ID, id);
+        LOG.info(CATEGORY_FOUND_BY_ID, id);
         return toCategoryResponse(categoryOptional.get());
     }
 
+    public CategoryResponse saveCategory(CategoryRequest request) {
+        var category = new Category(request.name(), request.active(), request.type());
+        var response = toCategoryResponse(repository.save(category));
+
+        LOG.info(CATEGORY_SAVED_SUCCESSFULLY);
+        return response;
+    }
+
     public CategoryResponse updateCategory(Long id, CategoryRequest request) {
-        Optional<Category> categoryOptional = repository.findById(id);
+        var categoryOptional = repository.findById(id);
 
         if (categoryOptional.isEmpty()) {
             LOG.warn(CATEGORY_ID_NOT_FOUND_LOG, id);
@@ -68,9 +77,21 @@ public class CategoryService {
         categoryOptional.get().setActive(request.active());
         categoryOptional.get().setType(request.type());
 
-        this.repository.save(categoryOptional.get());
+        var response = toCategoryResponse(repository.save(categoryOptional.get()));
         LOG.info(CATEGORY_UPDATE_SUCCESSFULLY);
-        return toCategoryResponse(categoryOptional.get());
+        return response;
+    }
+
+    public void deleteCategoryById(Long id) {
+        var categoryOptional = this.repository.findById(id);
+
+        if (categoryOptional.isEmpty()) {
+            LOG.warn(CATEGORY_ID_NOT_FOUND_LOG, id);
+            throw new NotFoundException(CATEGORY_ID_NOT_FOUND);
+        }
+
+        LOG.info(CATEGORY_DELETED_SUCCESSFULLY);
+        this.repository.delete(categoryOptional.get());
     }
 
 }
