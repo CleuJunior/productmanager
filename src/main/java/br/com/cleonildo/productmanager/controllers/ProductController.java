@@ -1,6 +1,5 @@
 package br.com.cleonildo.productmanager.controllers;
 
-import br.com.cleonildo.productmanager.dto.CategoryResponse;
 import br.com.cleonildo.productmanager.dto.ProductRequest;
 import br.com.cleonildo.productmanager.dto.ProductResponse;
 import br.com.cleonildo.productmanager.services.ProductService;
@@ -29,7 +28,7 @@ public class ProductController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<ProductResponse> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(this.service.getProductById(id));
     }
 
@@ -67,7 +66,7 @@ public class ProductController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<CategoryResponse> updateBrand(@PathVariable Long id) {
+    public ResponseEntity<Void> updateProduct(@PathVariable Long id) {
         this.service.deleteProductById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
